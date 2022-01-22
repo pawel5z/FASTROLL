@@ -1,4 +1,5 @@
 import numpy as np
+import chess
 from chess import Board
 
 chess_pieces = dict(zip(".prnbqkPRNBQK", range(13)))
@@ -19,3 +20,58 @@ def pieces(fen: str):
     raise NotImplemented
 
 
+def one_hot_enc_piece(piece: str):
+    """One-hot encode chess piece as 12-dimensional (6 types of pieces,
+    2 colors each) vector.
+    """
+    if piece == '.':
+        return np.zeros(len(chess_pieces) - 1)
+    index = chess_pieces[piece] - 1
+    zeros_before = [0] * index
+    """Why -2:
+    The 1st -1 becasue we have to count in dot at the beginning of `chess_pieces`.
+    The 2nd -1 to get index of last piece.
+    """
+    zeros_after = [0] * (len(chess_pieces) - 2 - index)
+    return np.array(zeros_before + [1] + zeros_after)
+
+
+def binary(fen: str):
+    """Encode game state as a 773-dimensional vector v, where for i in
+    {0, 12, ..., 756}
+    v_{i}   indicates that there's black pawn on square floor(i/12), \n
+    v_{i+1} indicates that there's black rook on square floor(i/12), \n
+    v_{i+2} indicates that there's black knight on square floor(i/12), \n
+    v_{i+3} indicates that there's black bishop on square floor(i/12), \n
+    v_{i+4} indicates that there's black queen on square floor(i/12), \n
+    v_{i+5} indicates that there's black king on square floor(i/12), \n
+
+    v_{i+6}  indicates that there's white pawn on square floor(i/12), \n
+    v_{i+7}  indicates that there's white rook on square floor(i/12), \n
+    v_{i+8}  indicates that there's white knight on square floor(i/12), \n
+    v_{i+9}  indicates that there's white bishop on square floor(i/12), \n
+    v_{i+10} indicates that there's white queen on square floor(i/12), \n
+    v_{i+11} indicates that there's white king on square floor(i/12). \n
+
+    Squares are ordered in row-major way from top left (A8) to bottom right (H1). \n
+
+    v_768 indicates player to move, \n
+    v_769 indicates whether black has kingside castling right, \n
+    v_770 indicates whether black has queenside castling right, \n
+    v_771 indicates whether white has kingside castling right, \n
+    v_772 indicates whether white has queenside castling right. \n
+
+    \"indicates\" means \"is set to 0 or 1 depending on whether condition is
+    false or true\"."""
+    board = Board(fen)
+    encoding = np.array([])
+    for p in str(board):
+        if p in '\n ':
+            continue
+        encoding = np.hstack((encoding, one_hot_enc_piece(p)))
+    encoding = np.hstack((encoding, int(board.turn)))
+    castling_rights = []
+    for castling_rook_pos in [chess.BB_H8, chess.BB_A8, chess.BB_H1, chess.BB_A1]:
+        castling_rights.append(int(bool(board.castling_rights & castling_rook_pos)))
+    encoding = np.hstack((encoding, np.array(castling_rights)))
+    return encoding
