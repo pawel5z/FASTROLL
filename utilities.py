@@ -4,6 +4,7 @@ i nadmiarowego kodu w jupyterze :)"""
 
 import numpy as np
 import pandas as pd
+from tqdm.auto import tqdm
 
 
 def easy_encode(df, encode):
@@ -12,7 +13,7 @@ def easy_encode(df, encode):
     column contains FEN formatted data and the second wins or loses
     coded as ones and zeros. Header is also required."""
     cols = df.columns
-    data = pd.DataFrame([encode(fen) for fen in df[cols[0]]])
+    data = pd.DataFrame((encode(fen) for fen in tqdm(df[cols[0]])))
     return data.join(df[cols[1]], on=df.index)
 
 
