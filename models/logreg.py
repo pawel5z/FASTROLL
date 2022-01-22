@@ -25,14 +25,14 @@ def logreg(X, Theta):
     return sigmoid(X @ Theta)
 
 
-def logreg_loss(Theta, X, Y):
+def logreg_loss(Theta, X, Y, alpha):
     "Logistic regression cost suitable for use with fmin_l_bfgs."
 
     # Reshape Theta into a column vector - lBFGS gives us a flat array
     ThetaR = valign(Theta)
 
     hx = logreg(X, ThetaR)
-    nll = -np.sum(Y.T @ slog(hx) + (1-Y).T @ slog(1-hx))
+    nll = -np.sum(Y.T @ slog(hx) + (1-Y).T @ slog(1-hx)) + alpha * (ThetaR @ ThetaR.T)
     grad = X.T @ (hx - Y)
 
     # Reshape grad into the shape of Theta, for fmin_l_bfsgb to work
@@ -40,13 +40,13 @@ def logreg_loss(Theta, X, Y):
 
 
 class LogisticRegression:
-    def __init__(self, X, Y):
+    def __init__(self, X, Y, alpha = 0):
         assert X.shape[0] == Y.shape[0], "shape mismatch!"
         assert Y.shape[1] == 1, "expected a vertical vector for Y!"
 
         # Call a solver
         self.theta = sopt.fmin_l_bfgs_b(
-            lambda Theta: logreg_loss(Theta, X, Y), np.zeros(X.shape[1])
+            lambda Theta: logreg_loss(Theta, X, Y, alpha), np.zeros(X.shape[1])
         )[0]
 
     def error(self, X, Y):
