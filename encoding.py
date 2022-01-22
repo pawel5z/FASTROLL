@@ -22,7 +22,19 @@ def pieces(fen: str):
 
 def one_hot_enc_piece(piece: str):
     """One-hot encode chess piece as 12-dimensional (6 types of pieces,
-    2 colors each) vector.
+    2 colors each) vector v, where \n
+    v_{0}  indicates black pawn, \n
+    v_{1}  indicates black rook, \n
+    v_{2}  indicates black knight, \n
+    v_{3}  indicates black bishop, \n
+    v_{4}  indicates black queen, \n
+    v_{5}  indicates black king, \n
+    v_{6}  indicates white pawn, \n
+    v_{7}  indicates white rook, \n
+    v_{8}  indicates white knight, \n
+    v_{9}  indicates white bishop, \n
+    v_{10} indicates white queen, \n
+    v_{11} indicates white king.
     """
     if piece == '.':
         return np.zeros(len(chess_pieces) - 1)
@@ -45,7 +57,6 @@ def binary(fen: str):
     v_{i+3} indicates that there's black bishop on square floor(i/12), \n
     v_{i+4} indicates that there's black queen on square floor(i/12), \n
     v_{i+5} indicates that there's black king on square floor(i/12), \n
-
     v_{i+6}  indicates that there's white pawn on square floor(i/12), \n
     v_{i+7}  indicates that there's white rook on square floor(i/12), \n
     v_{i+8}  indicates that there's white knight on square floor(i/12), \n
