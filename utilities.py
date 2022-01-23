@@ -25,3 +25,10 @@ def valign(v):
 def slog(x):
     "Numerically stable logarithm."
     return np.log(x + 1e-10)
+
+
+def XYsplit(df, Yname):
+    "Split dataframe into vertical X and Y numpy arrays."
+    X = df.copy()
+    Y = X.pop(Yname)
+    return np.array(X), valign(np.array(Y))

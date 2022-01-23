@@ -3,6 +3,10 @@ import chess
 from chess import Board
 
 chess_pieces = dict(zip(".prnbqkPRNBQK", range(13)))
+weights = {
+    "P": 1, "N": 3, "B": 3,
+    "R": 5, "Q": 9, "K": 0
+}
 
 
 def squares(fen: str):
@@ -11,13 +15,6 @@ def squares(fen: str):
     that it is occupied by or with zero otherwise."""
     board = str(Board(fen))
     return np.array([chess_pieces[p] for p in board if p not in '\n '])
-
-
-def pieces(fen: str):
-    """Encode game state as a vector of pieces,
-    where each piece is associated with the square
-    it occupies or with zero otherwise."""
-    raise NotImplemented
 
 
 def one_hot_enc_piece(piece: str):
@@ -83,6 +80,29 @@ def binary(fen: str):
     encoding = np.hstack((encoding, int(board.turn)))
     castling_rights = []
     for castling_rook_pos in [chess.BB_H8, chess.BB_A8, chess.BB_H1, chess.BB_A1]:
-        castling_rights.append(int(bool(board.castling_rights & castling_rook_pos)))
+        castling_rights.append(
+            int(bool(board.castling_rights & castling_rook_pos)))
     encoding = np.hstack((encoding, np.array(castling_rights)))
     return encoding
+
+
+def advantage(fen: str):
+    """Calculate player advantage based only on moves and pieces they possess.
+
+        - move advantage is the difference between the number of moves
+        available to each player
+        - material advantage is the difference of sums of weights of all the pieces
+        on the board
+
+    Values are positive if White has the advantage and negative otherwise.
+    """
+    board = Board(fen)
+    material_advantage = sum(
+        weights[p] if p in weights else -weights[p.upper()]
+        for p in str(board) if p not in '\n .'
+    )
+    board.turn = 1
+    move_advantage = len(list(board.legal_moves))
+    board.turn = 0
+    move_advantage -= len(list(board.legal_moves))
+    return np.array([move_advantage, material_advantage])
