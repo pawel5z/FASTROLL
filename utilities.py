@@ -4,6 +4,7 @@ i nadmiarowego kodu w jupyterze :)"""
 
 import numpy as np
 import pandas as pd
+import chess
 from chess import Board
 from matplotlib import pyplot as plt
 from collections import defaultdict
@@ -110,3 +111,77 @@ class Analizer(defaultdict):
         ax.legend()
         fig.tight_layout()
         plt.show()
+
+
+def pieces_distribution(df: pd.DataFrame):
+    """Return numbers of pieces on board and numbers of boards which consist
+    of this many pieces."""
+    distr = {}
+    for b_str in tqdm(df[df.columns[0]]):
+        b = Board(b_str)
+        pieces_cnt = len(b.piece_map())
+        if pieces_cnt not in distr:
+            distr[pieces_cnt] = 0
+        distr[pieces_cnt] += 1
+    return np.array(list(distr.keys())), np.array(list(distr.values()))
+
+
+def major_pieces_distribution(df: pd.DataFrame):
+    """Return numbers of major pieces (queens, rooks) on board and numbers
+    of boards which consist of this many pieces."""
+    distr = {}
+    for b_str in tqdm(df[df.columns[0]]):
+        b = Board(b_str)
+        pieces_cnt = len(b.pieces(chess.QUEEN, chess.BLACK)
+                         .union(b.pieces(chess.ROOK, chess.BLACK))
+                         .union(b.pieces(chess.QUEEN, chess.WHITE))
+                         .union(b.pieces(chess.ROOK, chess.WHITE)))
+        if pieces_cnt not in distr:
+            distr[pieces_cnt] = 0
+        distr[pieces_cnt] += 1
+    return np.array(list(distr.keys())), np.array(list(distr.values()))
+
+
+def minor_pieces_distribution(df: pd.DataFrame):
+    """Return numbers of minor pieces (bishops, knights) on boards and numbers
+    of boards which consist of this many pieces."""
+    distr = {}
+    for b_str in tqdm(df[df.columns[0]]):
+        b = Board(b_str)
+        pieces_cnt = len(b.pieces(chess.BISHOP, chess.BLACK)
+                         .union(b.pieces(chess.KNIGHT, chess.BLACK))
+                         .union(b.pieces(chess.BISHOP, chess.WHITE))
+                         .union(b.pieces(chess.KNIGHT, chess.WHITE)))
+        if pieces_cnt not in distr:
+            distr[pieces_cnt] = 0
+        distr[pieces_cnt] += 1
+    return np.array(list(distr.keys())), np.array(list(distr.values()))
+
+
+def pawns_distribution(df: pd.DataFrame):
+    """Return numbers of pawns on board and numbers of boards which consist of
+    this many pawns."""
+    distr = {}
+    for b_str in tqdm(df[df.columns[0]]):
+        b = Board(b_str)
+        pieces_cnt = len(b.pieces(chess.PAWN, chess.BLACK)
+                         .union(b.pieces(chess.PAWN, chess.WHITE)))
+        if pieces_cnt not in distr:
+            distr[pieces_cnt] = 0
+        distr[pieces_cnt] += 1
+    return np.array(list(distr.keys())), np.array(list(distr.values()))
+
+
+def draw_histograms(df: pd.DataFrame):
+    plotting_data = [
+        (pieces_distribution, 'number of pieces'),
+        (major_pieces_distribution, 'number of major pieces (queens, rooks)'),
+        (minor_pieces_distribution, 'number of minor pieces (bishops, knights)'),
+        (pawns_distribution, 'number of pawns')
+    ]
+    for (f, x_axis_description) in plotting_data:
+        xs, ys = f(df)
+        fig, ax = plt.subplots(dpi=200)
+        ax.set_xlabel(x_axis_description)
+        ax.set_ylabel('number of boards')
+        plt.bar(xs, ys, edgecolor='black', align='center')
