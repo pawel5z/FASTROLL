@@ -1,11 +1,16 @@
 # FASTROLL
 
-### TODO
-- indywidualna generacja datasetu (pary FEN i wynik meczu)
-- indywidualne kodowanie
-- regresja logistyczna
+🥂 Osiągnięto 12% celności na test secie, sukces ten zawdzięczamy regresji logistycznej i binarnemu kodowaniu! 🍻
 
-⚠ Najnowsze *badania* wykazały, że logistyczna regresja może nie być najlepszym podejściem xD ⚠
-Co można w związku z tym zrobić?
-- drzewa decyzyjne
-- regresja ale tym razem na wektorze cech
+### TODO
+- opracować relatywnie skuteczną metodę analizowania datasetów
+- turniej pomiędzy różnymi implementacjami agentów (ML, heurystyka, stockfish, random itd.)
+- sporządzić prezentację (najlepiej w Marpie 🌺)
+
+### Napisy końcowe ;)
+Ogółem projekt raczej chyli się już ku końcowi, ale wciąż można go rozwijać.
+Oto kilka pomysłów:
+- wygenerować dodatkowe datasety (np. dla większej celności stockfisha)
+- spróbować zbić te 12% wynajdując nowe, rewolucyjne kodowanie 🦄
+- zastosować drzewa decyzyjne (można użyć bibliotecznych dla kodowania binarnego, mimo że działają one tylko dla danych numerycznych)
+- zredukować wymiarowość i przyjrzeć się rozkładowi danych (https://scikit-learn.org/stable/modules/manifold.html#multidimensional-scaling)
