@@ -2,6 +2,7 @@
 nie trzeba dbać o porządek, chodzi tylko o redukcję niepotrzebnych plików
 i nadmiarowego kodu w jupyterze :)"""
 
+from typing import Iterable
 import numpy as np
 import pandas as pd
 import chess
@@ -113,59 +114,24 @@ class Analizer(defaultdict):
         plt.show()
 
 
-def pieces_distribution(df: pd.DataFrame):
-    """Return numbers of pieces on board and numbers of boards which consist
-    of this many pieces."""
+def count_pieces(df: pd.DataFrame, piece_symbols: str = None):
+    """Returns numbers of pieces on board and numbers of boards which consist
+    of this many pieces.
+
+    Args:
+        piece_symbols (str, optional): Piece symbols to count in. Defaults to
+        None, which means that all pieces will be counted.
+
+    Returns:
+       (pieces_cnts, boards_cnts): `ndarray`s containing numbers of specified
+       pieces and numbers of boards in `df` which contain these numbers of
+       pieces.
+    """
     distr = {}
     for b_str in tqdm(df[df.columns[0]]):
         b = Board(b_str)
-        pieces_cnt = len(b.piece_map())
-        if pieces_cnt not in distr:
-            distr[pieces_cnt] = 0
-        distr[pieces_cnt] += 1
-    return np.array(list(distr.keys())), np.array(list(distr.values()))
-
-
-def major_pieces_distribution(df: pd.DataFrame):
-    """Return numbers of major pieces (queens, rooks) on board and numbers
-    of boards which consist of this many pieces."""
-    distr = {}
-    for b_str in tqdm(df[df.columns[0]]):
-        b = Board(b_str)
-        pieces_cnt = len(b.pieces(chess.QUEEN, chess.BLACK)
-                         .union(b.pieces(chess.ROOK, chess.BLACK))
-                         .union(b.pieces(chess.QUEEN, chess.WHITE))
-                         .union(b.pieces(chess.ROOK, chess.WHITE)))
-        if pieces_cnt not in distr:
-            distr[pieces_cnt] = 0
-        distr[pieces_cnt] += 1
-    return np.array(list(distr.keys())), np.array(list(distr.values()))
-
-
-def minor_pieces_distribution(df: pd.DataFrame):
-    """Return numbers of minor pieces (bishops, knights) on boards and numbers
-    of boards which consist of this many pieces."""
-    distr = {}
-    for b_str in tqdm(df[df.columns[0]]):
-        b = Board(b_str)
-        pieces_cnt = len(b.pieces(chess.BISHOP, chess.BLACK)
-                         .union(b.pieces(chess.KNIGHT, chess.BLACK))
-                         .union(b.pieces(chess.BISHOP, chess.WHITE))
-                         .union(b.pieces(chess.KNIGHT, chess.WHITE)))
-        if pieces_cnt not in distr:
-            distr[pieces_cnt] = 0
-        distr[pieces_cnt] += 1
-    return np.array(list(distr.keys())), np.array(list(distr.values()))
-
-
-def pawns_distribution(df: pd.DataFrame):
-    """Return numbers of pawns on board and numbers of boards which consist of
-    this many pawns."""
-    distr = {}
-    for b_str in tqdm(df[df.columns[0]]):
-        b = Board(b_str)
-        pieces_cnt = len(b.pieces(chess.PAWN, chess.BLACK)
-                         .union(b.pieces(chess.PAWN, chess.WHITE)))
+        pieces_cnt = len([piece for piece in b.piece_map().values() if piece.symbol() in piece_symbols]) \
+            if piece_symbols is not None else len(b.piece_map())
         if pieces_cnt not in distr:
             distr[pieces_cnt] = 0
         distr[pieces_cnt] += 1
@@ -174,13 +140,13 @@ def pawns_distribution(df: pd.DataFrame):
 
 def draw_histograms(df: pd.DataFrame):
     plotting_data = [
-        (pieces_distribution, 'number of pieces'),
-        (major_pieces_distribution, 'number of major pieces (queens, rooks)'),
-        (minor_pieces_distribution, 'number of minor pieces (bishops, knights)'),
-        (pawns_distribution, 'number of pawns')
+        (None, 'number of pieces'),
+        ('qrQR', 'number of major pieces (queens, rooks)'),
+        ('bnBN', 'number of minor pieces (bishops, knights)'),
+        ('pP', 'number of pawns')
     ]
-    for (f, x_axis_description) in plotting_data:
-        xs, ys = f(df)
+    for (pieces_symbols, x_axis_description) in plotting_data:
+        xs, ys = count_pieces(df, pieces_symbols)
         fig, ax = plt.subplots(dpi=200)
         ax.set_xlabel(x_axis_description)
         ax.set_ylabel('number of boards')
