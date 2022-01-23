@@ -37,10 +37,9 @@ def one_hot_enc_piece(piece: str):
         return np.zeros(len(chess_pieces) - 1)
     index = chess_pieces[piece] - 1
     zeros_before = [0] * index
-    """Why -2:
-    The 1st -1 becasue we have to count in dot at the beginning of `chess_pieces`.
-    The 2nd -1 to get index of last piece.
-    """
+    # Why -2:
+    # The 1st -1 becasue we have to count in dot at the beginning of `chess_pieces`.
+    # The 2nd -1 to get index of last piece.
     zeros_after = [0] * (len(chess_pieces) - 2 - index)
     return np.array(zeros_before + [1] + zeros_after)
 
