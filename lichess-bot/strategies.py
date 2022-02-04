@@ -114,7 +114,7 @@ class MCTSLogRegStrategy(ExampleEngine):
     reg = agents.Regression(None, binary, theta=utilities.valign(np.fromfile('theta-all_sets-binary.csv', sep=' ')))
     def __init__(self, commands, options, stderr, draw_or_resign, name=None, **kwargs):
         super().__init__(commands, options, stderr, draw_or_resign, name)
-        self.agent = agents.MachineLearning(None, binary, reg=MCTSLogRegStrategy.reg)
+        self.agent = agents.MachineLearning(None, binary, reg=MCTSLogRegStrategy.reg, **options)
 
     def search(self, board, time_limit, ponder, draw_offered):
         return PlayResult(self.agent(game.State(board.fen())).peek(), None)

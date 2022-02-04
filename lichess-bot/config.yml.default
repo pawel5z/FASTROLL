@@ -54,6 +54,8 @@ engine:                      # Engine settings.
 # engine_options:            # Any custom command line params to pass to the engine.
 #   cpuct: 3.1
   homemade_options:
+    thinking_time: 50
+    exploration: 2
 #   Hash: 256
   uci_options:               # Arbitrary UCI options passed to the engine.
     Move Overhead: 100       # Increase if your bot flags games too often.
