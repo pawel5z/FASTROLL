@@ -1,5 +1,5 @@
-from .mcts import MCTS, AbstractEvaluator
-from .game import State
+from mcts import MCTS, AbstractEvaluator
+from game import State
 from models.logreg import LogisticRegression
 from utilities import *
 from numpy import array
