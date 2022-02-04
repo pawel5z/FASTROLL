@@ -73,11 +73,14 @@ class GenericHeuristic(AbstractEvaluator):
 
 
 class Regression(AbstractEvaluator):
-    def __init__(self, df, encoding_function, alpha=0):
+    def __init__(self, df, encoding_function, alpha=0, theta: np.ndarray = None):
         super().__init__()
-        df = easy_encode(df, encoding_function)
-        X, Y = XYsplit(df, df.columns[-1])
-        self.reg = LogisticRegression(X, Y, alpha=alpha)
+        if theta is not None:
+            self.reg = LogisticRegression(None, None, theta=theta)
+        else:
+            df = easy_encode(df, encoding_function)
+            X, Y = XYsplit(df, df.columns[-1])
+            self.reg = LogisticRegression(X, Y, alpha=alpha)
         self.encode = encoding_function
 
     def __call__(self, state):
@@ -109,9 +112,12 @@ class HeuristicSearch(AbstractAgent):
 
 
 class MachineLearning(AbstractAgent):
-    def __init__(self, df, encoding_function, alpha=0, **mcts_args):
+    def __init__(self, df, encoding_function, alpha=0, reg: Regression = None, **mcts_args):
         super().__init__()
-        self.mcts = MCTS(Regression(df, encoding_function, alpha=0), **mcts_args)
+        if reg is not None:
+            self.mcts = MCTS(reg, **mcts_args)
+        else:
+            self.mcts = MCTS(Regression(df, encoding_function, alpha=0), **mcts_args)
 
     def __call__(self, state):
         return self.mcts(state)

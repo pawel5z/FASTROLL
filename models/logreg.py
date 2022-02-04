@@ -40,7 +40,11 @@ def logreg_loss(Theta, X, Y, alpha):
 
 
 class LogisticRegression:
-    def __init__(self, X, Y, alpha = 0):
+    def __init__(self, X, Y, alpha=0, theta: np.ndarray = None):
+        if theta is not None:
+            self.theta = theta
+            return
+
         assert X.shape[0] == Y.shape[0], "shape mismatch!"
         assert Y.shape[1] == 1, "expected a vertical vector for Y!"
 
@@ -60,6 +64,6 @@ class LogisticRegression:
     def __call__(self, X):
         assert X.shape[1] == self.theta.shape[0], "theta shape mismatch!"
         return logreg(X, self.theta)
-    
+
     def __repr__(self):
         return str(self.theta)
