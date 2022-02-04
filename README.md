@@ -14,3 +14,16 @@ Oto kilka pomysłów:
 - zastosować drzewa decyzyjne (można użyć bibliotecznych dla kodowania binarnego, mimo że działają one tylko dla danych numerycznych)
 - zredukować wymiarowość i przyjrzeć się rozkładowi danych (https://scikit-learn.org/stable/modules/manifold.html#multidimensional-scaling)
 - rozwinąć Analizera
+
+## Lichess bot config
+
+```
+cd lichess-bot
+```
+
+Follow the instructions from:
+- https://github.com/ShailChoksi/lichess-bot#maclinux,
+- https://github.com/ShailChoksi/lichess-bot#lichess-oauth,
+- https://github.com/ShailChoksi/lichess-bot#-creating-a-homemade-bot.
+
+For more information about homemade bot creation, see https://github.com/ShailChoksi/lichess-bot#-creating-a-homemade-bot.
