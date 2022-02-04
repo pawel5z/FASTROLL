@@ -3,10 +3,16 @@ Some example strategies for people who want to create a custom, homemade bot.
 And some handy classes to extend
 """
 
+import __init__
+import sys
 import chess
 from chess.engine import PlayResult
 import random
 from engine_wrapper import EngineWrapper
+import numpy as np
+from encoding import binary
+from mcts_impl import agents, game
+import utilities
 
 
 class FillerEngine:
@@ -45,7 +51,7 @@ class MinimalEngine(EngineWrapper):
     however you can also change other methods like
     `notify`, `first_search`, `get_time_control`, etc.
     """
-    def __init__(self, commands, options, stderr, draw_or_resign, name=None):
+    def __init__(self, commands, options, stderr, draw_or_resign, name=None, **kwargs):
         super().__init__(options, draw_or_resign)
 
         self.engine_name = self.__class__.__name__ if name is None else name
@@ -66,7 +72,7 @@ class MinimalEngine(EngineWrapper):
     def notify(self, method_name, *args, **kwargs):
         """
         The EngineWrapper class sometimes calls methods on "self.engine".
-        "self.engine" is a filler property that notifies <self> 
+        "self.engine" is a filler property that notifies <self>
         whenever an attribute is called.
 
         Nothing happens unless the main engine does something.
@@ -102,3 +108,13 @@ class FirstMove(ExampleEngine):
         moves = list(board.legal_moves)
         moves.sort(key=str)
         return PlayResult(moves[0], None)
+
+
+class MCTSLogRegStrategy(ExampleEngine):
+    reg = agents.Regression(None, binary, theta=utilities.valign(np.fromfile('theta-all_sets-binary.csv', sep=' ')))
+    def __init__(self, commands, options, stderr, draw_or_resign, name=None, **kwargs):
+        super().__init__(commands, options, stderr, draw_or_resign, name)
+        self.agent = agents.MachineLearning(None, binary, reg=MCTSLogRegStrategy.reg)
+
+    def search(self, board, time_limit, ponder, draw_offered):
+        return PlayResult(self.agent(game.State(board.fen())).peek(), None)

@@ -3,9 +3,9 @@ url: "https://lichess.org/"  # Lichess base URL.
 
 engine:                      # Engine settings.
   dir: "./engines/"          # Directory containing the engine. This can be an absolute path or one relative to lichess-bot/.
-  name: "engine_name"        # Binary name of the engine to use.
+  name: "MCTSLogRegStrategy"        # Binary name of the engine to use.
   working_dir: ""            # Directory where the chess engine will read and write files. If blank or missing, the current directory is used.
-  protocol: "uci"            # "uci" or "xboard"
+  protocol: "homemade"       # "uci", "xboard" or "homemade"
   ponder: true               # Think on opponent's time.
   polyglot:
     enabled: false           # Activate polyglot book.
@@ -88,7 +88,7 @@ correspondence:
     ponder: false            # Ponder in correspondence games the bot is connected to.
 
 challenge:                   # Incoming challenges.
-  concurrency: 1             # Number of games to play simultaneously.
+  concurrency: 4             # Number of games to play simultaneously.
   sort_by: "best"            # Possible values: "best" and "first".
   accept_bot: false          # Accepts challenges coming from other bots.
   only_bot: false            # Accept challenges by bots only.
@@ -122,5 +122,5 @@ greeting:
     #   {opponent} to insert opponent's name
     #   {me} to insert bot's name
     # Any other words in curly braces will be removed.
-    hello: "Hi! I'm {me}. Good luck! Type !help for a list of commands I can respond to." # Message to send to chat at the start of a game
+    hello: "Hi! I'm {me}. Good luck!" # Message to send to chat at the start of a game
     goodbye: "Good game!" # Message to send to chat at the end of a game
