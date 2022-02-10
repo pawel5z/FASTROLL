@@ -105,3 +105,9 @@ def advantage(fen: str):
     board.turn = 0
     move_advantage -= len(list(board.legal_moves))
     return np.array([move_advantage, material_advantage])
+
+
+def binary_and_advantage(fen: str):
+    """Combined binary and advantage encoding.
+    See their respective descriptions for details."""
+    return np.append(binary(fen), advantage(fen))
