@@ -6,7 +6,7 @@ from random import choice
 class State(Board):
     uniques = set()
     stockfish = Stockfish(path="/usr/bin/stockfish",
-                          depth=10, parameters={'Threads': 2})
+                          depth=18, parameters={'Threads': 4})
 
     def __hash__(self):
         return (self.turn

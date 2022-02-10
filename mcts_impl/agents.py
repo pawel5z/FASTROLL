@@ -3,6 +3,7 @@ from game import State
 from models.logreg import LogisticRegression
 from utilities import *
 from numpy import array
+from stockfish import Stockfish
 
 
 class AbstractAgent:
@@ -87,6 +88,31 @@ class Regression(AbstractEvaluator):
         return self.reg(array([self.encode(state.fen())]))
 
 
+class StockfishEvaluator(AbstractEvaluator):
+    def __init__(self, stockfish_path="/usr/bin/stockfish", depth=10, elo=1000):
+        super().__init__()
+        self.stockfish = Stockfish(path=stockfish_path, depth=depth, parameters={'Threads': 4})
+        self.stockfish.set_elo_rating(elo)
+    
+    def __call__(self, state):
+        self.stockfish.set_fen_position(state.fen())
+        return self.stockfish.get_evaluation()["value"]
+
+
+class FishStock(AbstractAgent):
+    def __init__(self, stockfish_path="/usr/bin/stockfish", depth=10, elo=1000):
+        super().__init__()
+        self.stockfish = StockfishEvaluator(stockfish_path=stockfish_path, depth=depth, elo=elo)
+
+    def _evl(self, state, action):
+        sign = state.turn * 2 - 1
+        brd = state.copy().apply(action)
+        return sign * self.stockfish(brd)
+    
+    def __call__(self, state):
+        return state.apply(max( state.actions(), key=lambda a: self._evl(state, a)))
+
+
 class FullRandom(AbstractAgent):
     def __call__(self, state):
         return state.apply(state.random_action())
@@ -113,11 +139,11 @@ class HeuristicSearch(AbstractAgent):
 
 class MachineLearning(AbstractAgent):
     def __init__(self, df, encoding_function, alpha=0, reg: Regression = None, **mcts_args):
-        super().__init__()
+        super().__init__()1
         if reg is not None:
             self.mcts = MCTS(reg, **mcts_args)
         else:
-            self.mcts = MCTS(Regression(df, encoding_function, alpha=0), **mcts_args)
+            self.mcts = MCTS(Regression(df, encoding_function, alpha=alpha), **mcts_args)
 
     def __call__(self, state):
         return self.mcts(state)
