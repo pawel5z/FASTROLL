@@ -139,7 +139,7 @@ class HeuristicSearch(AbstractAgent):
 
 class MachineLearning(AbstractAgent):
     def __init__(self, df, encoding_function, alpha=0, reg: Regression = None, **mcts_args):
-        super().__init__()1
+        super().__init__()
         if reg is not None:
             self.mcts = MCTS(reg, **mcts_args)
         else:
